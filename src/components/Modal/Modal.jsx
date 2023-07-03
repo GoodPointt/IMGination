@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 
 import { ModalBackdrop, ModalContent } from 'components/Styled';
 import { useEffect } from 'react';
@@ -33,25 +33,24 @@ export const Modal = ({ toggleModal, showModal, children }) => {
   };
 
   return createPortal(
-    <ModalBackdrop onClick={handleBackdropClick}>
+    <ModalBackdrop
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{ overflow: 'hidden' }}
+      transition={{ duration: 0.3 }}
+      onClick={handleBackdropClick}
+    >
       <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+        <ModalContent
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.5, opacity: 0 }}
           style={{ overflow: 'hidden' }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.5 }}
         >
-          <ModalContent
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.5, opacity: 0 }}
-            style={{ overflow: 'hidden' }}
-            transition={{ duration: 1 }}
-          >
-            {children}
-          </ModalContent>
-        </motion.div>
+          {children}
+        </ModalContent>
       </AnimatePresence>
     </ModalBackdrop>,
     modalRoot

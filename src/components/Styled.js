@@ -8,7 +8,7 @@ export const StyledApp = styled.div`
   padding-bottom: 24px;
 `;
 
-export const ModalBackdrop = styled.div`
+export const ModalBackdrop = styled(motion.div)`
   position: fixed;
   top: 0;
   left: 0;
