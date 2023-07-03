@@ -1,93 +1,70 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { SearchForm } from './SearchForm/SearchForm';
 import { Modal } from './Modal/Modal';
 
-import { Loader, StyledApp } from './Styled';
+import { StyledApp } from './Styled';
 
-import { BallTriangle } from 'react-loader-spinner';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-export class App extends Component {
-  state = {
-    searchQuery: '',
-    largeImg: { largeImgPath: null, tags: '' },
-    showModal: false,
-    loading: false,
+export const App = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [largeImgPath, setLargeImgPath] = useState(null);
+  const [tags, setTags] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const toggleModal = (img, alts) => {
+    setLargeImgPath(img);
+    setTags(alts);
+    setShowModal(prevState => !prevState);
   };
 
-  toggleModal = (img, alts) => {
-    this.setState(prevState => ({
-      showModal: !prevState.showModal,
-      largeImg: { largeImgPath: img, tags: alts },
-    }));
-  };
-
-  onSearch = e => {
+  const onSearch = e => {
     e.preventDefault();
     const searchInput = e.currentTarget.elements[1].value.trim();
     if (searchInput === '') {
       toast.info('Enter search query fisrst!');
       return;
     }
-    this.setState({ searchQuery: searchInput });
+    setCurrentPage(1);
+    setSearchQuery(searchInput);
   };
 
-  loaderToggle = bool => {
-    this.setState({ loading: bool });
+  const loadMore = () => {
+    setCurrentPage(prevState => prevState + 1);
   };
 
-  render() {
-    const {
-      largeImg: { largeImgPath, tags },
-      searchQuery,
-      loading,
-      showModal,
-    } = this.state;
+  return (
+    <StyledApp>
+      <SearchForm onSearch={onSearch} />
 
-    return (
-      <StyledApp>
-        {loading && (
-          <Loader>
-            <BallTriangle
-              height={200}
-              width={200}
-              radius={5}
-              color="lightgray"
-              ariaLabel="ball-triangle-loading"
-              wrapperClass={{}}
-              wrapperStyle=""
-              visible={loading}
-            />
-          </Loader>
-        )}
-        <SearchForm onSearch={this.onSearch} />
-        <ImageGallery
-          onImgClick={this.toggleModal}
-          loaderToggle={this.loaderToggle}
-          searchQuery={searchQuery}
-        />
+      <ImageGallery
+        onImgClick={toggleModal}
+        searchQuery={searchQuery}
+        currentPage={currentPage}
+        loadMore={loadMore}
+      />
 
-        {showModal && (
-          <Modal closeModal={this.toggleModal} showModal={showModal}>
-            <img src={largeImgPath} alt={tags} />
-          </Modal>
-        )}
+      {showModal && (
+        <Modal closeModal={toggleModal} showModal={showModal}>
+          <img src={largeImgPath} alt={tags} />
+        </Modal>
+      )}
 
-        <ToastContainer
-          position="top-right"
-          autoClose={1700}
-          hideProgressBar={true}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="dark"
-        />
-      </StyledApp>
-    );
-  }
-}
+      <ToastContainer
+        position="top-right"
+        autoClose={1700}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
+    </StyledApp>
+  );
+};

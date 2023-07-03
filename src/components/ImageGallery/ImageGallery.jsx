@@ -4,44 +4,73 @@ import { BASE_URL, API_KEY, perPage } from 'api/api';
 import { toast } from 'react-toastify';
 
 import PropTypes from 'prop-types';
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
+import { LoaderSpinner } from 'components/Loader/Loader';
 
-export class ImageGallery extends Component {
-  state = {
-    currentPage: 1,
-    searchResult: [],
-    total: null,
-    showLoadMore: false,
-  };
+export const ImageGallery = ({
+  onImgClick,
+  searchQuery,
+  currentPage,
+  loadMore,
+}) => {
+  const [initialRender, setInitialRender] = useState(true);
+  const [searchResult, setSearchResult] = useState([]);
+  const [totalHits, setTotalHits] = useState(null);
+  const [showLoadMore, setShowLoadMore] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.searchQuery !== this.props.searchQuery) {
-      this.props.loaderToggle(true);
+  useEffect(() => {
+    const fetchImgs = async (BASE_URL, API_KEY, perPage) => {
+      const SEARCH_URL = `${BASE_URL}?q=${searchQuery}&page=${currentPage}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=${perPage}`;
 
-      this.setState({
-        currentPage: 1,
-        searchResult: [],
-        showLoadMore: false,
-      });
+      try {
+        const res = await fetch(SEARCH_URL);
+        if (res.ok) {
+          const { hits, total } = await res.json();
+          if (hits.length === 0) {
+            setLoading(false);
+            toast.warn(
+              `Sorry! But nothing found by your query "${searchQuery}"`
+            );
+          } else {
+            setSearchResult(prevState => [...prevState, ...hits]);
+            setTotalHits(total);
+            setShowLoadMore(total / currentPage > 12);
+          }
+        } else {
+          throw new Error('Oops! 😒');
+        }
+      } catch (error) {
+        toast.error(`Sorry! But something go wrong ${error.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      this.fetchImgs(BASE_URL, API_KEY, perPage);
+    if (searchQuery !== '' && currentPage === 1) {
+      setSearchResult([]);
+      setLoading(true);
+      setShowLoadMore(false);
+      fetchImgs(BASE_URL, API_KEY, perPage);
     }
 
-    if (this.state.currentPage !== prevState.currentPage) {
-      this.props.loaderToggle(true);
-      this.fetchImgs(BASE_URL, API_KEY, perPage);
+    if (currentPage > 1) {
+      setLoading(true);
+      fetchImgs(BASE_URL, API_KEY, perPage);
     }
+  }, [currentPage, searchQuery]);
 
-    if (this.state.total !== prevState.total) {
-      toast.success(
-        `We found ${this.state.total} ${this.props.searchQuery}s for you`
-      );
+  useEffect(() => {
+    if (initialRender) {
+      setInitialRender(false);
+    } else {
+      toast.success(`We found ${totalHits} ${searchQuery}s for you`);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalHits]);
 
-    if (
-      this.state.searchResult.length !== prevState.searchResult.length &&
-      prevState.searchResult.length !== 0
-    ) {
+  useEffect(() => {
+    if (currentPage !== 1) {
       const { scrollHeight, clientHeight } = document.documentElement;
       const scrollPosition = scrollHeight - clientHeight;
 
@@ -50,68 +79,32 @@ export class ImageGallery extends Component {
         behavior: 'smooth',
       });
     }
-  }
+  }, [currentPage, searchResult]);
 
-  fetchImgs = async (BASE_URL, API_KEY, perPage) => {
-    const SEARCH_URL = `${BASE_URL}?q=${this.props.searchQuery}&page=${this.state.currentPage}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=${perPage}`;
+  return (
+    <>
+      {loading && <LoaderSpinner loading={loading} />}
+      <ImageGalleryList>
+        {searchResult &&
+          searchResult.map(searchResultEl => (
+            <ImageGalleryItem
+              key={searchResultEl.id}
+              onImgClick={onImgClick}
+              searchResultEl={searchResultEl}
+            />
+          ))}
+      </ImageGalleryList>
 
-    try {
-      const res = await fetch(SEARCH_URL);
-      if (res.ok) {
-        const { hits, total } = await res.json();
-        if (hits.length === 0) {
-          this.props.loaderToggle(false);
-          toast.warn(
-            `Sorry! But nothing found by your query "${this.props.searchQuery}"`
-          );
-        } else {
-          this.setState(prevState => ({
-            searchResult: [...prevState.searchResult, ...hits],
-            total,
-            showLoadMore: total / this.state.currentPage > 12,
-          }));
-        }
-      } else {
-        throw new Error('Oops! 😒');
-      }
-    } catch (error) {
-      toast.error(`Sorry! But something go wrong ${error.message}`);
-    } finally {
-      this.props.loaderToggle(false);
-    }
-  };
-
-  loadMore = () => {
-    this.setState(prevState => ({ currentPage: prevState.currentPage + 1 }));
-  };
-
-  render() {
-    const { showLoadMore, searchResult } = this.state;
-    return (
-      <>
-        <ImageGalleryList>
-          {searchResult &&
-            searchResult.map(searchResultEl => (
-              <ImageGalleryItem
-                key={searchResultEl.id}
-                onImgClick={this.props.onImgClick}
-                searchResultEl={searchResultEl}
-              />
-            ))}
-        </ImageGalleryList>
-
-        {showLoadMore && (
-          <Button type="button" onClick={this.loadMore}>
-            Load more...
-          </Button>
-        )}
-      </>
-    );
-  }
-}
+      {showLoadMore && (
+        <Button type="button" onClick={loadMore}>
+          Load more...
+        </Button>
+      )}
+    </>
+  );
+};
 
 ImageGallery.propTypes = {
   onImgClick: PropTypes.func.isRequired,
-  loaderToggle: PropTypes.func.isRequired,
   searchQuery: PropTypes.string.isRequired,
 };
