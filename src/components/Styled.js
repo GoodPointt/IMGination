@@ -9,6 +9,7 @@ export const StyledApp = styled.div`
 `;
 
 export const ModalBackdrop = styled(motion.div)`
+  z-index: 2999;
   position: fixed;
   top: 0;
   left: 0;
