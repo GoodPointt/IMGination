@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { AnimatePresence } from 'framer-motion';
+// import { AnimatePresence } from 'framer-motion';
 
 import { ModalBackdrop, ModalContent } from 'components/Styled';
 import { useEffect } from 'react';
@@ -41,17 +41,15 @@ export const Modal = ({ toggleModal, showModal, children }) => {
       transition={{ duration: 0.3 }}
       onClick={handleBackdropClick}
     >
-      <AnimatePresence>
-        <ModalContent
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.5, opacity: 0 }}
-          style={{ overflow: 'hidden' }}
-          transition={{ duration: 0.5 }}
-        >
-          {children}
-        </ModalContent>
-      </AnimatePresence>
+      <ModalContent
+        initial={{ scale: 0.5, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.5, opacity: 0 }}
+        style={{ overflow: 'hidden' }}
+        transition={{ duration: 0.5 }}
+      >
+        {children}
+      </ModalContent>
     </ModalBackdrop>,
     modalRoot
   );

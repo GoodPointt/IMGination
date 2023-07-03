@@ -7,6 +7,7 @@ import { StyledApp } from './Styled';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { AnimatePresence } from 'framer-motion';
 
 export const App = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,20 +40,19 @@ export const App = () => {
   return (
     <StyledApp>
       <SearchForm onSearch={onSearch} />
-
       <ImageGallery
         onImgClick={toggleModal}
         searchQuery={searchQuery}
         currentPage={currentPage}
         loadMore={loadMore}
       />
-
-      {showModal && (
-        <Modal toggleModal={toggleModal} showModal={showModal}>
-          <img src={largeImgPath} alt={tags} />
-        </Modal>
-      )}
-
+      <AnimatePresence>
+        {showModal && (
+          <Modal toggleModal={toggleModal} showModal={showModal}>
+            <img src={largeImgPath} alt={tags} />
+          </Modal>
+        )}
+      </AnimatePresence>
       <ToastContainer
         position="top-right"
         autoClose={1700}
