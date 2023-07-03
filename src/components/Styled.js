@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { motion } from 'framer-motion';
 
 export const StyledApp = styled.div`
   display: grid;
@@ -14,15 +15,14 @@ export const ModalBackdrop = styled.div`
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
-export const ModalContent = styled.div`
+export const ModalContent = styled(motion.div)`
   color: wheat;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  /* width: calc(100vw - 40px); */
+
   width: 95vw;
   max-width: 720px;
   background-color: #212121;

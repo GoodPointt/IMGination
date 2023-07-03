@@ -48,7 +48,7 @@ export const App = () => {
       />
 
       {showModal && (
-        <Modal closeModal={toggleModal} showModal={showModal}>
+        <Modal toggleModal={toggleModal} showModal={showModal}>
           <img src={largeImgPath} alt={tags} />
         </Modal>
       )}

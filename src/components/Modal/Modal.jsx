@@ -1,49 +1,63 @@
 import PropTypes from 'prop-types';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { ModalBackdrop, ModalContent } from 'components/Styled';
-import { Component } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
 const modalRoot = document.querySelector('#modal-root');
 
-export class Modal extends Component {
-  componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDown);
-
-    this.scrollY = window.scrollY;
+export const Modal = ({ toggleModal, showModal, children }) => {
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    const scrollY = window.scrollY;
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
-    document.body.style.top = `-${this.scrollY}px`;
-  }
+    document.body.style.top = `-${scrollY}px`;
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'auto';
+      document.body.style.position = 'static';
+      window.scrollTo(0, scrollY);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showModal]);
 
-    document.body.style.overflow = 'auto';
-    document.body.style.position = 'static';
-    window.scrollTo(0, this.scrollY);
-  }
-
-  handleKeyDown = e => {
-    const { closeModal } = this.props;
-    if (e.code === 'Escape') closeModal();
+  const handleKeyDown = e => {
+    if (e.code === 'Escape') toggleModal();
   };
 
-  handleBackdropClick = e => {
-    const { closeModal } = this.props;
-    e.currentTarget === e.target && closeModal();
+  const handleBackdropClick = e => {
+    e.currentTarget === e.target && toggleModal();
   };
 
-  render() {
-    return createPortal(
-      <ModalBackdrop onClick={this.handleBackdropClick}>
-        <ModalContent>{this.props.children}</ModalContent>
-      </ModalBackdrop>,
-      modalRoot
-    );
-  }
-}
+  return createPortal(
+    <ModalBackdrop onClick={handleBackdropClick}>
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          style={{ overflow: 'hidden' }}
+          transition={{ duration: 1 }}
+        >
+          <ModalContent
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.5, opacity: 0 }}
+            style={{ overflow: 'hidden' }}
+            transition={{ duration: 1 }}
+          >
+            {children}
+          </ModalContent>
+        </motion.div>
+      </AnimatePresence>
+    </ModalBackdrop>,
+    modalRoot
+  );
+};
 
 Modal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+  toggleModal: PropTypes.func.isRequired,
 };
