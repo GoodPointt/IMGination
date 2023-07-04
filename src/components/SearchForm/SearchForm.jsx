@@ -8,7 +8,7 @@ import {
 import { ReactComponent as SearchIcon } from 'img/search.svg';
 import PropTypes from 'prop-types';
 
-export const SearchForm = ({ onSearch }) => {
+export const SearchForm = ({ onSearch, onChange }) => {
   return (
     <SearchBar>
       <StyledSearchForm onSubmit={onSearch}>
@@ -17,6 +17,8 @@ export const SearchForm = ({ onSearch }) => {
           <SearchIcon width="35 " height="35" />
         </SearchFormBtn>
         <SearchFormInput
+          onChange={onChange}
+          name="search"
           type="text"
           placeholder="Search images and photos..."
           autoComplete="off"

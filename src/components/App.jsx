@@ -10,6 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AnimatePresence } from 'framer-motion';
 
 export const App = () => {
+  const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [largeImgPath, setLargeImgPath] = useState(null);
@@ -21,10 +22,20 @@ export const App = () => {
     setTags(alts);
     setShowModal(prevState => !prevState);
   };
+  const onChange = e => {
+    const { name, value } = e.target;
+    switch (name) {
+      case 'search':
+        setSearchInput(value);
+        break;
 
+      default:
+        console.log(`Unknown type of name - ${name}`);
+        break;
+    }
+  };
   const onSearch = e => {
     e.preventDefault();
-    const searchInput = e.currentTarget.elements[1].value.trim();
     if (searchInput === '') {
       toast.info('Enter search query fisrst!');
       return;
@@ -39,7 +50,7 @@ export const App = () => {
 
   return (
     <StyledApp>
-      <SearchForm onSearch={onSearch} />
+      <SearchForm onSearch={onSearch} onChange={onChange} />
       <ImageGallery
         onImgClick={toggleModal}
         searchQuery={searchQuery}
