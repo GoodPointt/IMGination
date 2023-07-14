@@ -36,7 +36,7 @@ export const App = () => {
   };
   const onSearch = e => {
     e.preventDefault();
-    if (searchInput === '') {
+    if (searchInput.trim() === '') {
       toast.info('Enter search query fisrst!');
       return;
     }
