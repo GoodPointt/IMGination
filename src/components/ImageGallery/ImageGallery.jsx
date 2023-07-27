@@ -30,7 +30,7 @@ export const ImageGallery = ({
           if (hits.length === 0) {
             setLoading(false);
             toast.warn(
-              `Sorry! But nothing found by your query "${searchQuery}"`
+              `Sorry! But nothing found matches your query "${searchQuery}"`
             );
           } else {
             setSearchResult(prevState => [...prevState, ...hits]);
@@ -41,7 +41,7 @@ export const ImageGallery = ({
           throw new Error('Oops! 😒');
         }
       } catch (error) {
-        toast.error(`Sorry! But something go wrong ${error.message}`);
+        toast.error(`Oops!😒 Some error occured: "${error.message}"`);
       } finally {
         setLoading(false);
       }
@@ -66,7 +66,7 @@ export const ImageGallery = ({
     } else {
       toast.success(`We found ${totalHits} ${searchQuery}s for you`);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
   }, [totalHits]);
 
   useEffect(() => {
