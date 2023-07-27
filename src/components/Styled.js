@@ -25,7 +25,7 @@ export const ModalContent = styled(motion.div)`
   color: wheat;
 
   width: 95vw;
-  max-width: 720px;
+  max-width: 1080px;
   background-color: #212121;
   border-radius: 10px;
   box-shadow: 0px 0px 29px #d4d4d4, 0px 0px 0px 0px #000,
